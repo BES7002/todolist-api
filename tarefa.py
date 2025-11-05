@@ -1,27 +1,30 @@
+from colorama import Cursor
 from flask import jsonify
+from conexao import get_conexao
+from psycopg2.extras import RealDictCursor
 
 def buscar_tarefas():
-    tarefas = [
-        {
-            'id':1,
-            'nome':'Aprender digitação',
-            'descricao': 'Vamos aumentar o zoom para não errar',
-            'default': 'Pendente'
-        },
-        {
-            'id':2,
-            'nome':'Caminhar',
-            'descricao': '120Km durante o periodo matutino',
-            'default': 'Pendente'
-        },
-    ]
-    return jsonify(tarefas)
+    con = get_conexao()
+    cursor = con.cursor(cursor_factory = RealDictCursor)
+    cursor.execute(
+        "SELECT id, name, description FROM todos;"
+    )
 
-def buscar_tarefa():
-    tarefa = {
-        'id':3,
-        'nome':'Aprender natação',
-        'descricao': 'Vamos nadar',
-        'default': 'Pendente'
-    }
-    return jsonify(tarefa)
+    todos = cursor.fetchall()
+    cursor.close()
+
+    return jsonify(todos)
+
+def buscar_tarefa(id):
+    con = get_conexao()
+    cursor = con.cursor(cursor_factory = RealDictCursor)
+    cursor.execute(
+        "SELECT id, name, description FROM todos WHERE id = %s;",(id,)
+    )
+
+    todos = cursor.fetchone()
+
+    cursor.close()
+    con.close()
+
+    return jsonify(todos)
