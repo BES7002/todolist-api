@@ -1,5 +1,5 @@
 from flask import Flask, redirect, request
-from tarefa import buscar_tarefas, buscar_tarefa, criar_tarefa
+from tarefa import *
 
 app = Flask(__name__)
 
@@ -37,6 +37,23 @@ def create_tarefa():
     # retorna algo
     return {
         'message': 'Tarefa cadastrada'
+    }
+@app.route('/api/tarefas/<int:tarefa_id>', methods=['DELETE'])
+def delete_tarefa(tarefa_id):
+    apagar_tarefa(tarefa_id)
+    return {
+        'message': 'tarefa apagada com sucesso'
+    }
+
+@app.route('/api/tarefas/<int:tarefa_id>', methods=['PUT'])
+def update_tarefa(tarefa_id):
+    corpo = request.get_json()
+    tarefa_name = corpo.get('name')
+    tarefa_description = corpo.get('description')
+
+    atualizar_tarefa(tarefa_id, tarefa_name, tarefa_description)
+    return {
+        "message": "Tarefa atualização com sucesso"
     }
 
 # Se for o modulo principal roda o projeto em debug(atualiza o projeto simultaneamente)
